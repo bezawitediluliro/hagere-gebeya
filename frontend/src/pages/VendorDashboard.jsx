@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Package, Tag, BarChart2 } from 'lucide-react';
+import { ArrowLeft, Plus, Package, Tag, BarChart2, Settings } from 'lucide-react';
 import api, { userApi } from '../api/client';
+import { useLanguage } from '../hooks/useLanguage';
 import styles from './VendorDashboard.module.css';
 
 export default function VendorDashboard() {
@@ -13,6 +14,9 @@ export default function VendorDashboard() {
   const [showAddDiscount, setShowAddDiscount] = useState(false);
   const [form, setForm] = useState({ name: '', price: '', description: '', category: '', stock: '' });
   const [dcForm, setDcForm] = useState({ code: '', type: 'PERCENTAGE', value: '', minOrder: '', maxUses: '' });
+
+  const { lang } = useLanguage();
+  const t = (en, am) => lang === 'am' ? am : en;
 
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => userApi.me() });
   const vendor = me?.vendor;
@@ -66,7 +70,8 @@ export default function VendorDashboard() {
   });
 
   if (!vendor) {
-    return <VendorApplyForm />;
+    navigate('/vendor/onboarding', { replace: true });
+    return null;
   }
 
   if (!vendor.approved) {
@@ -74,12 +79,12 @@ export default function VendorDashboard() {
       <div className={styles.page}>
         <div className={styles.header}>
           <button className={styles.back} onClick={() => navigate(-1)}><ArrowLeft size={20} /></button>
-          <h1 className={styles.title}>Vendor Dashboard</h1>
+          <h1 className={styles.title}>{t('Vendor Dashboard', 'የሻጭ ዳሽቦርድ')}</h1>
         </div>
         <div className={styles.pending}>
           <Package size={48} />
-          <h2>Application Pending</h2>
-          <p>Your shop "{vendor.name}" is under review. We'll notify you once approved!</p>
+          <h2>{t('Application Pending', 'ማመልከቻ በመጠበቅ ላይ')}</h2>
+          <p>{t(`Your shop "${vendor.name}" is under review. We'll notify you via Telegram once approved!`, `ሱቅዎ "${vendor.name}" እየተገመገመ ነው። ሲጸድቅ በቴሌግራም እናሳውቅዎታለን!`)}</p>
         </div>
       </div>
     );
@@ -93,13 +98,16 @@ export default function VendorDashboard() {
         <button className={styles.back} onClick={() => navigate(-1)}><ArrowLeft size={20} /></button>
         <div className={styles.headerInfo}>
           <h1 className={styles.title}>{vendor.name}</h1>
-          <span className={styles.approved}>✅ Active</span>
+          <span className={styles.approved}>✅ {t('Active', 'ንቁ')}</span>
         </div>
+        <button className={styles.settingsBtn} onClick={() => navigate('/vendor/settings')}>
+          <Settings size={20} />
+        </button>
       </div>
 
       {/* Tabs */}
       <div className={styles.tabs}>
-        {[['orders', Package, 'Orders'], ['products', BarChart2, 'Products'], ['discounts', Tag, 'Discounts']].map(([key, Icon, label]) => (
+        {[['orders', Package, t('Orders','ትዕዛዞች')], ['products', BarChart2, t('Products','ምርቶች')], ['discounts', Tag, t('Discounts','ቅናሾች')]].map(([key, Icon, label]) => (
           <button key={key} className={`${styles.tab} ${tab === key ? styles.tabActive : ''}`} onClick={() => setTab(key)}>
             <Icon size={16} /> {label}
           </button>
@@ -223,36 +231,3 @@ export default function VendorDashboard() {
   );
 }
 
-function VendorApplyForm() {
-  const qc = useQueryClient();
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', description: '', category: '', phone: '', address: '' });
-
-  const applyMutation = useMutation({
-    mutationFn: () => userApi.applyVendor(form),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['me'] }),
-  });
-
-  return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <button className={styles.back} onClick={() => navigate(-1)}><ArrowLeft size={20} /></button>
-        <h1 className={styles.title}>Become a Vendor</h1>
-      </div>
-      <div className={styles.content}>
-        <p className={styles.applyDesc}>Register your shop on Hager Gebeya and start selling to local customers!</p>
-        <div className={styles.form}>
-          {[['name', 'Shop Name *'], ['description', 'Description'], ['category', 'Category (e.g. Groceries, Fashion)'], ['phone', 'Phone Number'], ['address', 'Address']].map(([key, label]) => (
-            <input key={key} className={styles.input} placeholder={label}
-              value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} />
-          ))}
-          <button className={styles.submitBtn} onClick={() => applyMutation.mutate()}
-            disabled={!form.name || applyMutation.isPending}>
-            {applyMutation.isPending ? 'Submitting...' : 'Submit Application'}
-          </button>
-          {applyMutation.isError && <p className={styles.error}>{applyMutation.error.message}</p>}
-        </div>
-      </div>
-    </div>
-  );
-}

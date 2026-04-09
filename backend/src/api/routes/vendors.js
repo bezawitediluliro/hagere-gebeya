@@ -39,6 +39,27 @@ router.get('/categories', async (req, res) => {
   res.json([...new Set(vendors.map(v => v.category).filter(Boolean))]);
 });
 
+// PATCH /api/vendors/:id — update own vendor profile
+router.patch('/:id', telegramAuth, requireVendor, async (req, res) => {
+  const vendorId = parseInt(req.params.id);
+  if (req.vendor.id !== vendorId) return res.status(403).json({ error: 'Forbidden' });
+
+  const { name, description, category, phone, address, logoUrl, bannerUrl } = req.body;
+  const vendor = await prisma.vendor.update({
+    where: { id: vendorId },
+    data: {
+      ...(name !== undefined && { name: name.trim() }),
+      ...(description !== undefined && { description }),
+      ...(category !== undefined && { category }),
+      ...(phone !== undefined && { phone }),
+      ...(address !== undefined && { address }),
+      ...(logoUrl !== undefined && { logoUrl }),
+      ...(bannerUrl !== undefined && { bannerUrl }),
+    },
+  });
+  res.json(vendor);
+});
+
 // GET /api/vendors/:id — vendor details
 router.get('/:id', async (req, res) => {
   const vendor = await prisma.vendor.findFirst({

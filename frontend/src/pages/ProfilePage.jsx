@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Store, Package, User, Star, Gift, Share2, Globe, ChevronRight, Phone } from 'lucide-react';
+import { Store, Package, User, Star, Gift, Share2, Globe, ChevronRight, Phone, Edit2 } from 'lucide-react';
 import { userApi } from '../api/client';
 import { useTelegram } from '../hooks/useTelegram';
 import { useLanguage } from '../hooks/useLanguage';
@@ -48,11 +48,14 @@ export default function ProfilePage() {
           <div className={styles.name}>
             {me?.firstName || tgUser?.first_name || 'Guest'}
             {me?.role === 'ADMIN' && <span className={styles.adminBadge}>Admin</span>}
-            {me?.role === 'VENDOR' && <span className={styles.vendorBadge}>{t('manageOrders').includes('ት') ? 'ሻጭ' : 'Vendor'}</span>}
+            {me?.role === 'VENDOR' && <span className={styles.vendorBadge}>{lang === 'am' ? 'ሻጭ' : 'Vendor'}</span>}
           </div>
           {me?.username && <div className={styles.username}>@{me.username}</div>}
           {me?.phone && <div className={styles.phone}>{me.phone}</div>}
         </div>
+        <button className={styles.editProfileBtn} onClick={() => navigate('/profile/edit')}>
+          <Edit2 size={16} />
+        </button>
       </div>
 
       {/* Loyalty points card */}
@@ -109,7 +112,7 @@ export default function ProfilePage() {
             <span>{t('applicationPending')} ({vendor.name})</span>
           </div>
         ) : (
-          <button className={styles.menuItem} onClick={() => navigate('/vendor')}>
+          <button className={styles.menuItem} onClick={() => navigate('/vendor/onboarding')}>
             <Store size={18} className={styles.menuIcon} />
             <span>{t('becomeVendor')}</span>
             <ChevronRight size={16} className={styles.arrow} />

@@ -18,6 +18,12 @@
 .name { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .username { font-size: 13px; opacity: 0.85; }
 .phone { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+.editProfileBtn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.35);
+}
 .adminBadge { font-size: 11px; background: #7c3aed; color: #fff; padding: 2px 8px; border-radius: 10px; }
 .vendorBadge { font-size: 11px; background: #16a34a; color: #fff; padding: 2px 8px; border-radius: 10px; }
 

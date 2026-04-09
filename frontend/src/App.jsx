@@ -10,7 +10,10 @@ import OrdersPage from './pages/OrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 import VendorDashboard from './pages/VendorDashboard';
+import VendorOnboarding from './pages/VendorOnboarding';
 import ProfilePage from './pages/ProfilePage';
+import ProfileEditPage from './pages/ProfileEditPage';
+import VendorSettingsPage from './pages/VendorSettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
 
 export default function App() {
@@ -32,7 +35,10 @@ export default function App() {
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/orders/:id" element={<OrderDetailPage />} />
         <Route path="/vendor" element={<VendorDashboard />} />
+        <Route path="/vendor/onboarding" element={<VendorOnboarding />} />
+        <Route path="/vendor/settings" element={<VendorSettingsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/edit" element={<ProfileEditPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
