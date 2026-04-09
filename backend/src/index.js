@@ -9,30 +9,23 @@ const { bot, setupBotWebhook } = require('./bot');
 const apiRoutes = require('./api/routes');
 const { errorHandler } = require('./api/middleware/errorHandler');
 const { prisma } = require('./services/db');
+const { startCronJobs } = require('./services/cron');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// API routes
 app.use('/api', apiRoutes);
 
-// Telegram webhook
 if (process.env.NODE_ENV === 'production' && process.env.WEBHOOK_URL) {
   app.use(bot.webhookCallback('/webhook'));
 }
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'hager-gebeya' });
-});
-
-// Error handler (must be last)
+app.get('/health', (req, res) => res.json({ status: 'ok', service: 'hager-gebeya' }));
 app.use(errorHandler);
 
 async function start() {
@@ -47,6 +40,8 @@ async function start() {
       bot.launch();
       console.log('✅ Bot polling started');
     }
+
+    startCronJobs(bot);
 
     app.listen(PORT, () => {
       console.log(`✅ Server running on port ${PORT}`);

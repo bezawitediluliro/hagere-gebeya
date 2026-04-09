@@ -8,31 +8,46 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  telegramId String   @unique
-  username   String?
-  firstName  String?
-  lastName   String?
-  phone      String?
-  role       String   @default("CUSTOMER")
-  createdAt  DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  telegramId   String   @unique
+  username     String?
+  firstName    String?
+  lastName     String?
+  phone        String?
+  role         String   @default("CUSTOMER")
+  language     String   @default("en")
+  points       Int      @default(0)
+  referralCode String?  @unique
+  referredById Int?
+  banned       Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
-  orders    Order[]
-  cartItems CartItem[]
-  vendor    Vendor?
+  orders        Order[]
+  cartItems     CartItem[]
+  vendor        Vendor?
+  reviews       Review[]
+  notifications Notification[]
+  referredBy    User?          @relation("Referrals", fields: [referredById], references: [id])
+  referrals     User[]         @relation("Referrals")
 }
 
 model Vendor {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  logoUrl     String?
-  phone       String?
-  address     String?
-  category    String?
-  approved    Boolean  @default(false)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  logoUrl       String?
+  bannerUrl     String?
+  phone         String?
+  address       String?
+  category      String?
+  tags          String?
+  approved      Boolean  @default(false)
+  active        Boolean  @default(true)
+  featured      Boolean  @default(false)
+  rating        Float    @default(0)
+  reviewCount   Int      @default(0)
+  totalRevenue  Float    @default(0)
+  createdAt     DateTime @default(now())
 
   ownerId Int  @unique
   owner   User @relation(fields: [ownerId], references: [id])
@@ -40,17 +55,28 @@ model Vendor {
   products  Product[]
   orders    Order[]
   discounts Discount[]
+  reviews   Review[]
+  ads       Ad[]
 }
 
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
+  nameAm      String?
   description String?
+  descriptionAm String?
   price       Float
+  salePrice   Float?
   imageUrl    String?
+  images      String?
   category    String?
+  tags        String?
   stock       Int      @default(999)
   active      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  sold        Int      @default(0)
   createdAt   DateTime @default(now())
 
   vendorId Int
@@ -58,6 +84,7 @@ model Product {
 
   cartItems  CartItem[]
   orderItems OrderItem[]
+  adProduct  Ad[]
 }
 
 model Discount {
@@ -70,6 +97,7 @@ model Discount {
   usedCount Int       @default(0)
   expiresAt DateTime?
   active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
 
   vendorId Int?
   vendor   Vendor? @relation(fields: [vendorId], references: [id])
@@ -96,6 +124,8 @@ model Order {
   total       Float
   discount    Float    @default(0)
   finalTotal  Float
+  pointsUsed  Int      @default(0)
+  pointsEarned Int     @default(0)
   notes       String?
   address     String?
   createdAt   DateTime @default(now())
@@ -112,6 +142,7 @@ model Order {
 
   items   OrderItem[]
   payment Payment?
+  review  Review?
 }
 
 model OrderItem {
@@ -135,4 +166,66 @@ model Payment {
 
   orderId Int   @unique
   order   Order @relation(fields: [orderId], references: [id])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  userId   Int
+  user     User   @relation(fields: [userId], references: [id])
+  orderId  Int    @unique
+  order    Order  @relation(fields: [orderId], references: [id])
+  vendorId Int
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+}
+
+model Ad {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  imageUrl    String?
+  type        String   // "banner" | "featured_vendor" | "featured_product"
+  active      Boolean  @default(true)
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  budget      Float    @default(0)
+  spent       Float    @default(0)
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime @default(now())
+
+  vendorId  Int?
+  vendor    Vendor?  @relation(fields: [vendorId], references: [id])
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String
+  titleEn   String
+  titleAm   String?
+  bodyEn    String
+  bodyAm    String?
+  read      Boolean  @default(false)
+  data      String?
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model WeeklyReport {
+  id          Int      @id @default(autoincrement())
+  weekStart   DateTime
+  weekEnd     DateTime
+  vendorId    Int?
+  totalOrders Int
+  totalRevenue Float
+  newCustomers Int
+  topProducts String?
+  sentAt      DateTime @default(now())
 }
