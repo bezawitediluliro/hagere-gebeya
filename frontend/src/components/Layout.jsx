@@ -18,10 +18,7 @@ export default function Layout() {
 
   const { data: notifData } = useQuery({
     queryKey: ['notifications'],
-    queryFn: async () => {
-      const api = (await import('../api/client')).default;
-      return api.get('/notifications');
-    },
+    queryFn: () => import('../api/client').then(m => m.default.get('/notifications')),
     staleTime: 30000,
   });
 
