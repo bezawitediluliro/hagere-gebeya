@@ -1,0 +1,28 @@
+# Environment files - NEVER commit these
+.env
+.env.local
+.env.production
+
+# Database
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+*.db
+*.db-journal
+
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+admin/node_modules/
+
+# Build output
+frontend/dist/
+admin/dist/
+
+# Uploads
+backend/uploads/
+
+# Misc
+.DS_Store
+*.log
+.vercel

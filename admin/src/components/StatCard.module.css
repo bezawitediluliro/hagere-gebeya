@@ -1,0 +1,30 @@
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.blue .icon  { background: #eff6ff; color: #2563eb; }
+.green .icon { background: #f0fdf4; color: #16a34a; }
+.orange .icon { background: #fff7ed; color: #ea580c; }
+.purple .icon { background: #faf5ff; color: #7c3aed; }
+
+.value { font-size: 22px; font-weight: 800; line-height: 1; }
+.label { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.sub { font-size: 12px; color: var(--muted); margin-top: 4px; }

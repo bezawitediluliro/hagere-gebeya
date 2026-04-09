@@ -1,0 +1,118 @@
+.root {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: -240px;
+  height: 100vh;
+  z-index: 200;
+  transition: left 0.25s ease;
+  box-shadow: var(--shadow-md);
+}
+
+.sidebarOpen { left: 0; }
+
+@media (min-width: 900px) {
+  .sidebar { left: 0; }
+  .main { margin-left: 240px; }
+  .menuBtn { display: none !important; }
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo { display: flex; align-items: center; gap: 10px; }
+.logoEmoji { font-size: 24px; }
+.logoText { font-size: 17px; font-weight: 800; color: var(--text); }
+.sidebarClose { color: var(--muted); padding: 4px; }
+@media (min-width: 900px) { .sidebarClose { display: none; } }
+
+.nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.navItem:hover { background: var(--bg); color: var(--text); }
+.navActive {
+  background: #eff6ff;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.sidebarFooter {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+.adminLabel { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 150;
+}
+@media (min-width: 900px) { .overlay { display: none; } }
+
+/* Main */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.menuBtn {
+  color: var(--text);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.pageTitle { font-size: 16px; font-weight: 700; }
+
+.content { padding: 20px 16px; max-width: 1000px; }

@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  telegramId String   @unique
+  username   String?
+  firstName  String?
+  lastName   String?
+  phone      String?
+  role       String   @default("CUSTOMER")
+  createdAt  DateTime @default(now())
+
+  orders    Order[]
+  cartItems CartItem[]
+  vendor    Vendor?
+}
+
+model Vendor {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  logoUrl     String?
+  phone       String?
+  address     String?
+  category    String?
+  approved    Boolean  @default(false)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  ownerId Int  @unique
+  owner   User @relation(fields: [ownerId], references: [id])
+
+  products  Product[]
+  orders    Order[]
+  discounts Discount[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  category    String?
+  stock       Int      @default(999)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  vendorId Int
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+}
+
+model Discount {
+  id        Int       @id @default(autoincrement())
+  code      String    @unique
+  type      String
+  value     Float
+  minOrder  Float?
+  maxUses   Int?
+  usedCount Int       @default(0)
+  expiresAt DateTime?
+  active    Boolean   @default(true)
+
+  vendorId Int?
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
+
+  orders Order[]
+}
+
+model CartItem {
+  id        Int @id @default(autoincrement())
+  userId    Int
+  productId Int
+  quantity  Int @default(1)
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  orderNumber String   @unique
+  status      String   @default("PENDING")
+  total       Float
+  discount    Float    @default(0)
+  finalTotal  Float
+  notes       String?
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  vendorId Int
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  discountId   Int?
+  discountUsed Discount? @relation(fields: [discountId], references: [id])
+
+  items   OrderItem[]
+  payment Payment?
+}
+
+model OrderItem {
+  id       Int   @id @default(autoincrement())
+  quantity Int
+  price    Float
+
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  method        String
+  status        String   @default("PENDING")
+  transactionId String?
+  amount        Float
+  createdAt     DateTime @default(now())
+
+  orderId Int   @unique
+  order   Order @relation(fields: [orderId], references: [id])
+}
